@@ -4,6 +4,8 @@ import ErrorApp from "./ErrorApp";
 import { EventEmitter } from "events";
 import Card from "./Card";
 import Timeout from "./Timeout";
+import { log } from "./logger";
+import { incPartyPlayed, setNbParty, playCard as metricPlayCard } from "./metrics";
 
 enum StatusParty {
   waitSecondPlayer,
@@ -40,6 +42,7 @@ export default class ShiFuMi extends EventEmitter {
     this.timeout = new Timeout(ShiFuMi.durationParty, this.destructor.bind(this));
 
     ShiFuMi.listCurrentParty.push(this);
+    setNbParty(ShiFuMi.listCurrentParty.length);
   }
 
   public addSecondPlayer(user: User) {
@@ -64,6 +67,7 @@ export default class ShiFuMi extends EventEmitter {
     if (!pl) throw new ErrorApp("This user don't play on this party", "shiFuMi-playCard1");
     if (pl.card) throw new ErrorApp("This player have already card", "shiFuMi-playCard2", "Vous avez déjà joué une carte");
     pl.card = card;
+    metricPlayCard(card);
     if (this.players[(this.players.indexOf(pl) + 1) % 2].card) this.statusParty = StatusParty.showResult;
   }
 
@@ -73,6 +77,7 @@ export default class ShiFuMi extends EventEmitter {
     const resultForPl2 = this.players[1].card.resultWith(this.players[0].card);
 
     this.emit("result party", [resultForPl1, resultForPl2], [this.players[0].card, this.players[1].card]);
+    incPartyPlayed();
   }
 
   public voteRestart(user: User) {
@@ -115,11 +120,13 @@ export default class ShiFuMi extends EventEmitter {
   }
 
   private destructor() {
-    console.log("Delete " + this.name);
+    log(`Party ${this.name} was deleted`);
+
     this.statusParty = StatusParty.end;
     this.emit("delete party");
     const i = ShiFuMi.listCurrentParty.indexOf(this);
     ShiFuMi.listCurrentParty.splice(i, 1);
+    setNbParty(ShiFuMi.listCurrentParty.length);
   }
 
   public regenerateSecret() {

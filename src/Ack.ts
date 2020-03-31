@@ -1,4 +1,5 @@
 import ErrorApp from "./ErrorApp";
+import { error } from "./logger";
 
 export enum TypeAck {
   success = "success",
@@ -27,12 +28,8 @@ export default class Ack {
         if (err instanceof ErrorApp) {
           if (err.publicMessage) obj.message = err.publicMessage;
           if (err.code) obj.code = err.code;
-          console.error(
-            `Error: ${err.message} ${err.code ? `Code: ${err.code}` : ""} ${
-              err.publicMessage ? `publicMSg: ${err.publicMessage}` : ""
-            }`
-          );
-        } else console.error(err);
+          error(`Error: ${err.message} ${err.code ? `Code: ${err.code}` : ""} ${err.publicMessage ? `publicMSg: ${err.publicMessage}` : ""}`);
+        } else error(err);
         new Ack(funcAck, TypeAck.error, obj);
       }
     };

@@ -1,6 +1,6 @@
 {
   "name": "shifumi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "src/index.ts",
   "scripts": {
@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@pm2/io": "^4.3.3",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "socket.io": "^2.3.0",
