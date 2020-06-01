@@ -7,7 +7,7 @@ function getTodayDate() {
 }
 function getNowHour() {
   const date = new Date();
-  return `${fill(date.getUTCHours())}:${fill(date.getUTCMinutes())}:${fill(date.getUTCSeconds())}`;
+  return `${fill(date.getUTCHours() + 1)}:${fill(date.getUTCMinutes())}:${fill(date.getUTCSeconds())}`;
 }
 function fill(str: number) {
   return ("0" + str).slice(-2);
